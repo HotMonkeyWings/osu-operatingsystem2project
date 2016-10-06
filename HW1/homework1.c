@@ -2,6 +2,10 @@
  *	CS 444 Assignment 1 - The Producer-Consumer Problem
  *	By: Jonathan Harijanto and Kyle Martin Collins
  *
+ *	Resources: 
+ *	www.sourceware.org, docs.oracle.com, https://linux.die.net
+ *	pubs.opengroup.org  
+ *
  */
 
 #include <stdio.h>
@@ -19,6 +23,9 @@
 pthread_cond_t bufferFull =  PTHREAD_COND_INITIALIZER;
 pthread_cond_t bufferNotFull = PTHREAD_COND_INITIALIZER;
 
+// Insert something here
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+
 // Struct with two numbers
 struct value{
 	int number;
@@ -32,7 +39,16 @@ void *producer(void *arg){
 
 	
 	while(true){
+		// Initial wait time before 'producing' 
+		sleep(producerWait);
+		// Block calling thread to ensure synchronized access
+		pthread_mutex_lock(&mutex);
+		// lll
+		while(){
 
+		}			
+		// Unlock the thread
+		pthread_mutex_unlock(&mutex);
 	}
 }
 
