@@ -18,7 +18,6 @@
 #include <pthread.h>
 #include <time.h>
 #include <signal.h>
-
 #include "mt19937ar.c"
 
 // Set buffer size 
@@ -39,6 +38,7 @@ struct value {
 	int waitPeriod;
 };
 
+// Declare buffer of type value
 struct value buffer[BUFFERMAX];
 
 void *producer(void *arg){
@@ -108,21 +108,23 @@ void *consumer(void *arg){
 	
 		pthread_mutex_unlock(&mutex);
 
-		sleep(buffer[bufferCounter].waitPeriod);
+		// Consumer sleep prior to printing the other value
+		sleep(buffer[bufferCounter-1].waitPeriod);
+
 
 		printf("\nI'm a Consumer!\n");
 		printf("Current index: %d/32, Value of produced item: %d," 
-			"Going to sleep for: %d seconds\n", bufferCounter, 
-			buffer[bufferCounter].number, buffer[bufferCounter].waitPeriod);
+			"Going to sleep for: %d seconds\n", bufferCounter-1, 
+			buffer[bufferCounter-1].number, buffer[bufferCounter-1].waitPeriod);
 		printf("\n ========================================================== \n");
 
 		// Block calling thread to ensure synchronized access
 		pthread_mutex_lock(&mutex);
-
+	
 		bufferCounter -= 1;
 
-		// Wakes up the waiting consumer
-		pthread_cond_signal(&consumerWait);
+		// Wakes up the waiting producer
+		pthread_cond_signal(&producerWait);
 		// Unlock the thread
 		pthread_mutex_unlock(&mutex);
 
@@ -132,18 +134,19 @@ void *consumer(void *arg){
 // Terminates the process when user press CTRL+C
 void signalHandler(int signal){
 	if(signal == SIGINT){
-		printf("SIGINT (Ctrl+C) caught!");
+		printf("\nSIGINT (Ctrl+C) caught! Exiting now...\n");
+		exit(0);
 		// Free the memory because user cancels it
-		//pthread_detach(theProd);
-		//pthread_detach(theCons);
+		//pthread_detach(producer);
+		//pthread_detach(consumer);
 	}
 }
 
 int main(){
-	
+
 	pthread_t theProd;
 	pthread_t theCons;
-
+	
 	// Initialize seed with time()
 	init_genrand(time(NULL));
 
@@ -152,16 +155,15 @@ int main(){
 
 	// Initialize mutex and conditional variable reference 	
 	pthread_mutex_init(&mutex, NULL);	
-  	pthread_cond_init(&consumerWait, NULL);		
   	pthread_cond_init(&producerWait, NULL);
+  	pthread_cond_init(&consumerWait, NULL);		
 
   	// Create a new thread
-  	pthread_create(&theCons, NULL, consumer, NULL);
   	pthread_create(&theProd, NULL, producer, NULL);
+  	pthread_create(&theCons, NULL, consumer, NULL);
 
   	// Suspend execution of thread untill it terminates
-  	pthread_join(theCons, NULL);
   	pthread_join(theProd, NULL);
-
-	return 0;	
+  	pthread_join(theCons, NULL);
+	
 } 
