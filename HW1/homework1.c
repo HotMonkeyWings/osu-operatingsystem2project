@@ -2,10 +2,13 @@
  *	CS 444 Assignment 1 - The Producer-Consumer Problem
  *	By: Jonathan Harijanto and Kyle Martin Collins
  *
- *	Resources:  
+ *	Method: Pair programming	
+ *
+ *	Resources: 
  *	www.sourceware.org, docs.oracle.com, https://linux.die.net
- *	pubs.opengroup.org, stackoverflow.com, ibm.com/support/knowledgecenter,
- *	computing.llnl.gov, yolinux.com, and classmates.
+ *	pubs.opengroup.org, stackoverflow.com, ibm.com/support/knowledgecenter
+ *	computing.llnl.gov/tutorials/pthreads and classmates!
+ *
  *
  */
 
@@ -36,7 +39,6 @@ struct value {
 	int waitPeriod;
 };
 
-// bla
 struct value buffer[BUFFERMAX];
 
 void *producer(void *arg){
@@ -44,7 +46,7 @@ void *producer(void *arg){
 	struct value producer;
 
 	// Wait random amount of time (3-7 seconds)
-	int producerWait = genrand_int32() % 8 + 3;	
+	int producerWait = genrand_int32() % 5 + 3;	
 	
 	while(1){
 		// Initial wait time before 'producing' 
@@ -58,25 +60,24 @@ void *producer(void *arg){
 			printf("Buffer is full, producer has to wait.\n");
 	
 			// Condition variable is blocked - producer has to wait
-			pthread_cond_wait(&producerWait, &mutex); 
+			pthread_cond_wait(&producerWait,&mutex); 
 		}
 	
-		// If buffer not full, Producer generate random number value 
-		// 1 - 25 
+		// If buffer not full, Producer generates random number (1-25) 
 		producer.number = genrand_int32() % 25 + 1;
 	
-		// Producer random wait time (3-7) before producing again
-		producer.waitPeriod = genrand_int32() % 8 + 3;
+		// Produce random wait time (2-9) for consumer
+		producer.waitPeriod = genrand_int32() % 8 + 2;
 	
 		// Store it to buffer
 		buffer[bufferCounter] = producer;
 
+		printf("\n ========================================================== \n");
 		printf("I'm a producer!\n");
 		printf("Current index: %d/32, Value of produced item: %d," 
 			"Going to sleep for: %d seconds\n", bufferCounter, 
-			producer.number, producer.waitPeriod);
+			producer.number, producerWait);
 
-		// Check buffer space after storage
 		if(bufferCounter == 32) {
 			printf("Resetting buffer...\n");
 			bufferCounter = 0;
@@ -84,73 +85,83 @@ void *producer(void *arg){
 			bufferCounter += 1;		
 		}
 	
-		// Unlock the thread
-		pthread_mutex_unlock(&mutex);
 		// Wakes up the waiting consumer
 		pthread_cond_signal(&consumerWait);
+		// Unlock the thread
+		pthread_mutex_unlock(&mutex);
 	}
 }
 
 void *consumer(void *arg){
 
 	while(1){
+
 		// Block calling thread to ensure synchronized access
 		pthread_mutex_lock(&mutex);
-		
-		// Check for empty space in the buffer
+
 		while(bufferCounter == 0){
-			printf("Buffer is empty, consumer has to wait!");
-			// Condition variable is blocked, consumer has to wait
-			pthread_cond_wait(&consumerWait, &mutex);
+			printf("Buffer is empty, consumer has to wait.\n");
+	
+			// Condition variable is blocked - consumer has to wait
+			pthread_cond_wait(&consumerWait,&mutex); 
 		}
+	
+		pthread_mutex_unlock(&mutex);
 
-		// If the buffer is not empty - Consumer consume the value
+		sleep(buffer[bufferCounter].waitPeriod);
 
-		// ** DO SOMETHING **
+		printf("\nI'm a Consumer!\n");
+		printf("Current index: %d/32, Value of produced item: %d," 
+			"Going to sleep for: %d seconds\n", bufferCounter, 
+			buffer[bufferCounter].number, buffer[bufferCounter].waitPeriod);
+		printf("\n ========================================================== \n");
 
+		// Block calling thread to ensure synchronized access
+		pthread_mutex_lock(&mutex);
 
+		bufferCounter -= 1;
+
+		// Wakes up the waiting consumer
+		pthread_cond_signal(&consumerWait);
 		// Unlock the thread
 		pthread_mutex_unlock(&mutex);
-		pthread_cond_signal(&producerWait);
+
 	}
 }
 
-// A (popular) function that will terminate the process if receive SIGINT signal
-void signalHandler(int signalNumber){
-	if(signalNumber == SIGINT){
-		printf("Received SIGINT (CTRL +C)\n");
-		// Sends a cancelation request to the threads
-		//
-		// ** DO SOMETHING **
+// Terminates the process when user press CTRL+C
+void signalHandler(int signal){
+	if(signal == SIGINT){
+		printf("SIGINT (Ctrl+C) caught!");
+		// Free the memory because user cancels it
+		//pthread_detach(theProd);
+		//pthread_detach(theCons);
 	}
 }
 
 int main(){
-
-	// Catch interruption
-	signal(SIGINT, signalHandler);
 	
-	// Keep a thread ID
-	pthread_t producer;
-	pthread_t consumer;
-
-	// Buffer memory allocation
-	// ** DO SOMETHING **
+	pthread_t theProd;
+	pthread_t theCons;
 
 	// Initialize seed with time()
-	init_genrand(time(NULL));	
+	init_genrand(time(NULL));
 
-	// Initialize mutex and variable condition
-	pthread_mutex_init(&mutex, NULL);
-	pthread_cond_init(&producerWait, NULL);
-	pthread_cond_init(&consumerWait, NULL);
+	// Set the interruption handler
+	signal(SIGINT, signalHandler);	
 
-	// Starts new threads
-	pthread_create(&producer, NULL, producer, NULL);
-	pthread_create(&consumer, NULL, consumer, NULL);
+	// Initialize mutex and conditional variable reference 	
+	pthread_mutex_init(&mutex, NULL);	
+  	pthread_cond_init(&consumerWait, NULL);		
+  	pthread_cond_init(&producerWait, NULL);
 
-	// Suspend execution of the calling thread until target terminated
-	pthread_join(producer, NULL);
-	pthread_join(consumer, NULL);
-	
+  	// Create a new thread
+  	pthread_create(&theCons, NULL, consumer, NULL);
+  	pthread_create(&theProd, NULL, producer, NULL);
+
+  	// Suspend execution of thread untill it terminates
+  	pthread_join(theCons, NULL);
+  	pthread_join(theProd, NULL);
+
+	return 0;	
 } 
