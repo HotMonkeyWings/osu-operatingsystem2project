@@ -1,0 +1,164 @@
+\documentclass[letterpaper,10pt]{article}
+
+\usepackage{graphicx}                                        
+\usepackage{amssymb}                                         
+\usepackage{amsmath}                                         
+\usepackage{amsthm}                                          
+
+\usepackage{alltt}                                           
+\usepackage{float}
+\usepackage{color}
+\usepackage{url}
+
+\usepackage{balance}
+\usepackage[TABBOTCAP, tight]{subfigure}
+\usepackage{enumitem}
+\usepackage{pstricks, pst-node}
+\usepackage{array}
+
+\usepackage{geometry}
+\geometry{textheight=8.5in, textwidth=6in}
+
+%random comment
+
+\newcommand{\cred}[1]{{\color{red}#1}}
+\newcommand{\cblue}[1]{{\color{blue}#1}}
+
+\newcommand{\toc}{\tableofcontents}
+
+%\usepackage{hyperref}
+
+\def\name{D. Kevin McGrath}
+
+%pull in the necessary preamble matter for pygments output
+%\input{pygments.tex}
+
+%% The following metadata will show up in the PDF properties
+% \hypersetup{
+%   colorlinks = false,
+%   urlcolor = black,
+%   pdfauthor = {\name},
+%   pdfkeywords = {cs311 ``operating systems'' files filesystem I/O},
+%   pdftitle = {CS 311 Project 1: UNIX File I/O},
+%   pdfsubject = {CS 311 Project 1},
+%   pdfpagemode = UseNone
+% }
+
+\parindent = 0.0 in
+\parskip = 0.1 in
+
+\begin{document}
+	
+	\begin{titlepage}
+		\centering
+		{\scshape\LARGE \textbf{CSS 444 HW 1 - Concurrency}\par}
+		{\LARGE\itshape \textbf{Kyle Collins and Jonathan Harijanto}\par}
+		{\LARGE Fall 2016\par}
+		{\LARGE \today\par}
+		
+		{\LARGE Abstract\par}
+		Write stuff here when done with hw. 
+		
+	\end{titlepage}
+	
+	\clearpage
+	\tableofcontents
+	
+	%input the pygmentized output of mt19937ar.c, using a (hopefully) unique name
+	%this file only exists at compile time. Feel free to change that.
+	
+	\clearpage
+	\section{Command Log}
+		\newcounter{rowcount}
+		\setcounter{rowcount}{0}
+		\begin{tabular}{@{\stepcounter{rowcount}\therowcount.)\hspace*{\tabcolsep}}ll}
+			mkdir CS444-029 \\
+			
+			Cd CS444-029 \\
+			
+			Git clone git://git.yoctoproject.org/linux-yocto-3.14 \\
+			
+			Cd linux-yocto-3.14	\\		
+			
+			Git checkout v3.14.26 \\	
+			
+			Source /scratch/opt/environment-setup-i586-poky-linux.csh \\	
+					
+			Cp /scratch/fall2016/files/config-3.14.26-yocto-qemu .config \\
+			
+			Cp /scratch/fall2016/files/bzImage-qemux86.bin /scratch/fall2016/CS444-029/linux-yocto-3.14/ \\
+			
+			Cp /scratch/fall2016/files/core-image-lsb-qemux86.ext3 /scratch/fall2016/CS444-029/linux-yocto-3.14/ \\
+			
+			Make -j4 all \\
+			
+			qemu-system-i386 -gdb tcp::5529 -S -nographic -kernel bzImage-qemux86.bin -drive file=core-image-lsb-sdk-qemux86.ext3,if=virtio -enable-kvm -net none -usb -localtime --no-reboot --append "root=/dev/vda rw console=ttyS0 debug" \\
+			
+			Gdb \\
+			
+			(gdb) Target remote:5529 \\
+			
+			(gdb) continue \\
+			qemu-system-i386  \\
+			
+		\end{tabular}
+
+	\clearpage
+	\section{Concurrency Write-up}
+	
+	\textbf{Reasoning For Assignment}\
+		The reasoning for this assignment is twofold. The first reason is to set up the virtual machine for later use in the class. Many of the future assignments in this class will make use of the VM and it is important to familiarize ourselves with it early so that we do not negatively impact the work of other groups and so that we can focus on the core lessons of those future assignments. The second reason for this assignment is to serve as an introduction to concurrency. Concurrency is an important concept in Computer Science as it allows for greater efficiency in certain tasks.\\
+		
+	 
+
+	
+	\clearpage
+	\section{Qemu Flags}
+	\textbf{-gdp tcp::5529} : Instruct the system to wait for GDB connection on TCP with a port number of 5,529. \\
+	
+	\textbf{-S} : Instruct CPU to not start during startup. \\
+	
+	\textbf{-nographic} : Instruct QEMU to run in command line form. \\
+	
+	\textbf{-enable-KVM} : Enables KVM (Kernel Virtual Machine) for Linux. \\
+	
+	\textbf{-net none} : Enable the USB driver.
+	
+	\textbf{-localtime} : Use system local time.
+	
+	\textbf{--no-reboot} : Exit instead of rebooting.
+	
+	\textbf{--append "root=/dev/vda rw console=ttyS0 debug"} : Allows for extra options in the kernel command line. 
+	
+	
+	
+	\clearpage
+	\section{Version Control Log}
+	
+	\clearpage
+	\section{Work Log}
+	
+
+	
+%	\subsection{blah}
+%	\subsubsection{yada yada}
+%	This is a paragraph in \LaTeX.
+	
+%	This is a new paragraph.
+	
+%	\begin{itemize}
+%		\item \begin{equation}
+%			\label{eq1}
+%			\int_0^\pi \sin(x) \partial x
+%		\end{equation}
+%		\item $\backslash$ As seen in Eq. \ref{eq1}, % blah blah blah
+%	\end{itemize}
+
+	
+%	\emph{\textbf{\color{red}This is italicized and red}}
+%	\tableofcontents
+	
+%	\section*{Appendix 1: Source Code}
+%	\input{__mt19937ar.c.tex}
+	
+\end{document}
