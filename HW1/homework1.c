@@ -7,7 +7,7 @@
  *	Resources: 
  *	www.sourceware.org, docs.oracle.com, https://linux.die.net
  *	pubs.opengroup.org, stackoverflow.com, ibm.com/support/knowledgecenter
- *	computing.llnl.gov/tutorials/pthreads and classmates!
+ *	computing.llnl.gov/tutorials/pthreads.
  *
  *
  */
@@ -45,10 +45,10 @@ void *producer(void *arg){
 	// Declare struct
 	struct value producer;
 
-	// Wait random amount of time (3-7 seconds)
-	int producerWait = genrand_int32() % 5 + 3;	
-	
 	while(1){
+		// Wait random amount of time (3-7 seconds)
+		int producerWait = genrand_int32() % 5 + 3;	
+
 		// Initial wait time before 'producing' 
 		sleep(producerWait);
 		
@@ -75,7 +75,7 @@ void *producer(void *arg){
 		printf("\n ========================================================== \n");
 		printf("I'm a producer!\n");
 		printf("Current index: %d/32, Value of produced item: %d," 
-			"Going to sleep for: %d seconds\n", bufferCounter, 
+			" Going to sleep for: %d seconds\n", bufferCounter, 
 			producer.number, producerWait);
 
 		if(bufferCounter == 32) {
@@ -111,20 +111,19 @@ void *consumer(void *arg){
 		// Consumer sleep prior to printing the other value
 		sleep(buffer[bufferCounter-1].waitPeriod);
 
-
-		printf("\nI'm a Consumer!\n");
-		printf("Current index: %d/32, Value of produced item: %d," 
-			"Going to sleep for: %d seconds\n", bufferCounter-1, 
-			buffer[bufferCounter-1].number, buffer[bufferCounter-1].waitPeriod);
-		printf("\n ========================================================== \n");
-
 		// Block calling thread to ensure synchronized access
 		pthread_mutex_lock(&mutex);
+
+		printf("\nI'm a Consumer!\n");
+		printf("Current index: %d/32, Value being consumed: %d," 
+			" Have to sleep for: %d seconds\n", bufferCounter-1, 
+			buffer[bufferCounter-1].number, buffer[bufferCounter-1].waitPeriod);
+		printf("\n ========================================================== \n");
 	
 		bufferCounter -= 1;
 
 		// Wakes up the waiting producer
-		pthread_cond_signal(&producerWait);
+		// pthread_cond_signal(&producerWait);
 		// Unlock the thread
 		pthread_mutex_unlock(&mutex);
 
@@ -134,11 +133,8 @@ void *consumer(void *arg){
 // Terminates the process when user press CTRL+C
 void signalHandler(int signal){
 	if(signal == SIGINT){
-		printf("\nSIGINT (Ctrl+C) caught! Exiting now...\n");
+		printf(" --> SIGINT (Ctrl+C) caught! Exiting now.\n");
 		exit(0);
-		// Free the memory because user cancels it
-		//pthread_detach(producer);
-		//pthread_detach(consumer);
 	}
 }
 
@@ -165,5 +161,10 @@ int main(){
   	// Suspend execution of thread untill it terminates
   	pthread_join(theProd, NULL);
   	pthread_join(theCons, NULL);
+
+	// Clean-up by destroying the thread & mutex
+	pthread_mutex_destroy(&mutex);
+	pthread_cond_destroy(&theProd);
+	pthread_cond_destroy(&theCons);
 	
 } 
