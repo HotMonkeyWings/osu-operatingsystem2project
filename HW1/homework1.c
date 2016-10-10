@@ -46,22 +46,19 @@ void *producer(void *arg){
 	struct value producer;
 
 	while(1){
-		// Wait random amount of time (3-7 seconds)
-		int producerWait = genrand_int32() % 5 + 3;	
-
-		// Initial wait time before 'producing' 
-		sleep(producerWait);
-		
 		// Block calling thread to ensure synchronized access
 		pthread_mutex_lock(&mutex);
 	
 		// Check for space availability in buffer
-		while(bufferCounter == BUFFERMAX){
+		if(bufferCounter == BUFFERMAX){
 			printf("Buffer is full, producer has to wait.\n");
 	
 			// Condition variable is blocked - producer has to wait
 			pthread_cond_wait(&producerWait,&mutex); 
 		}
+	
+		// Wait random amount of time (3-7 seconds)
+		int producerWait = genrand_int32() % 5 + 3;	
 	
 		// If buffer not full, Producer generates random number (1-25) 
 		producer.number = genrand_int32() % 25 + 1;
@@ -71,62 +68,89 @@ void *producer(void *arg){
 	
 		// Store it to buffer
 		buffer[bufferCounter] = producer;
+		
+		bufferCounter += 1;
 
-		printf("\n ========================================================== \n");
+		printf("\n=========================================================== \n");
 		printf("I'm a producer!\n");
 		printf("Current index: %d/32, Value of produced item: %d," 
-			" Going to sleep for: %d seconds\n", bufferCounter, 
+			" Going to sleep for: %d seconds\n", bufferCounter - 1, 
 			producer.number, producerWait);
 
-		if(bufferCounter == 32) {
-			printf("Resetting buffer...\n");
-			bufferCounter = 0;
+		if(bufferCounter == 1) {
+			// Unlock the  thread
+			pthread_mutex_unlock(&mutex);
+
+			// Wakes up the waiting consumer
+			pthread_cond_signal(&consumerWait);
+
+			// Wait time before 'producing' again
+			sleep(producerWait);
 		} else {
-			bufferCounter += 1;		
+			// Unlock the thread
+			pthread_mutex_unlock(&mutex);
+
+			// Wait time before 'producing' again
+			sleep(producerWait);
 		}
-	
-		// Wakes up the waiting consumer
-		pthread_cond_signal(&consumerWait);
-		// Unlock the thread
-		pthread_mutex_unlock(&mutex);
 	}
 }
 
 void *consumer(void *arg){
 
 	while(1){
+		struct value tmp;
+
+		int bufferTmp;
 
 		// Block calling thread to ensure synchronized access
 		pthread_mutex_lock(&mutex);
 
-		while(bufferCounter == 0){
+		bufferTmp = bufferCounter - 1;
+
+		tmp = buffer[bufferTmp];
+
+		if(bufferCounter == 0){
 			printf("Buffer is empty, consumer has to wait.\n");
 	
 			// Condition variable is blocked - consumer has to wait
 			pthread_cond_wait(&consumerWait,&mutex); 
 		}
 	
+		bufferCounter -= 1;
+
+		printf("\nI'm a Consumer!\n");
+		printf("I will sleep for %d seconds, for item at index %d.\n", tmp.waitPeriod, bufferTmp);
+		
 		pthread_mutex_unlock(&mutex);
 
 		// Consumer sleep prior to printing the other value
-		sleep(buffer[bufferCounter-1].waitPeriod);
+		sleep(tmp.waitPeriod);
 
 		// Block calling thread to ensure synchronized access
 		pthread_mutex_lock(&mutex);
 
 		printf("\nI'm a Consumer!\n");
-		printf("Current index: %d/32, Value being consumed: %d," 
-			" Have to sleep for: %d seconds\n", bufferCounter-1, 
-			buffer[bufferCounter-1].number, buffer[bufferCounter-1].waitPeriod);
-		printf("\n ========================================================== \n");
+		printf("I consumed item at index %d, the value being consumed: %d."
+			, bufferTmp, tmp.number);
+		printf("\n=========================================================== \n");
+
+		if(bufferCounter == BUFFERMAX){	
+			// Unlock the thread
+			pthread_mutex_unlock(&mutex);
+
+			// Wakes up the waiting producer
+			pthread_cond_signal(&producerWait);
+		}
+
+		if(bufferCounter == 0){
+			printf("Buffer is empty, consumer has to wait.\n");
 	
-		bufferCounter -= 1;
-
-		// Wakes up the waiting producer
-		// pthread_cond_signal(&producerWait);
-		// Unlock the thread
+			// Condition variable is blocked - consumer has to wait
+			pthread_cond_wait(&consumerWait,&mutex); 
+		}
+		
 		pthread_mutex_unlock(&mutex);
-
 	}
 }
 
