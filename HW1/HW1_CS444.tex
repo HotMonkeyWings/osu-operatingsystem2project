@@ -1,4 +1,4 @@
-\documentclass[letterpaper,10pt]{article}
+\documentclass[letterpaper,10pt,draftclsnofoot,titlepage,onecolumn]{IEEEtran}
 
 \usepackage{graphicx}                                        
 \usepackage{amssymb}                                         
@@ -34,15 +34,15 @@
 %\input{pygments.tex}
 
 %% The following metadata will show up in the PDF properties
-% \hypersetup{
+%\hypersetup{
 %   colorlinks = false,
 %   urlcolor = black,
 %   pdfauthor = {\name},
-%   pdfkeywords = {cs311 ``operating systems'' files filesystem I/O},
-%   pdftitle = {CS 311 Project 1: UNIX File I/O},
-%   pdfsubject = {CS 311 Project 1},
+%   pdfkeywords = {cs444 ``operating systems 2'' Homework 1},
+%   pdftitle = {CS 444 Project 1: Getting Acquainted},
+%   pdfsubject = {CS 444 Project 1},
 %   pdfpagemode = UseNone
-% }
+%}
 
 \parindent = 0.0 in
 \parskip = 0.1 in
@@ -71,35 +71,34 @@
 	\section{Command Log}
 		\newcounter{rowcount}
 		\setcounter{rowcount}{0}
-		\begin{tabular}{@{\stepcounter{rowcount}\therowcount.)\hspace*{\tabcolsep}}ll}
+		\begin{tabular}{@{\stepcounter{rowcount}\therowcount.)\hspace*{\tabcolsep}}ll}	
 			mkdir CS444-029 \\
 			
-			Cd CS444-029 \\
+			cd CS444-029 \\
 			
-			Git clone git://git.yoctoproject.org/linux-yocto-3.14 \\
+			git clone git://git.yoctoproject.org/linux-yocto-3.14 \\
 			
-			Cd linux-yocto-3.14	\\		
+			cd linux-yocto-3.14	\\		
 			
-			Git checkout v3.14.26 \\	
+			git checkout v3.14.26 \\	
 			
-			Source /scratch/opt/environment-setup-i586-poky-linux.csh \\	
+			source /scratch/opt/environment-setup-i586-poky-linux.csh \\	
 					
-			Cp /scratch/fall2016/files/config-3.14.26-yocto-qemu .config \\
+			cp /scratch/fall2016/files/config-3.14.26-yocto-qemu .config \\
 			
-			Cp /scratch/fall2016/files/bzImage-qemux86.bin /scratch/fall2016/CS444-029/linux-yocto-3.14/ \\
+			cp /scratch/fall2016/files/bzImage-qemux86.bin /scratch/fall2016/CS444-029/linux-yocto-3.14/ \\
 			
-			Cp /scratch/fall2016/files/core-image-lsb-qemux86.ext3 /scratch/fall2016/CS444-029/linux-yocto-3.14/ \\
+			cp /scratch/fall2016/files/core-image-lsb-qemux86.ext3 /scratch/fall2016/CS444-029/linux-yocto-3.14/ \\
 			
-			Make -j4 all \\
+			make -j4 all \\
 			
-			qemu-system-i386 -gdb tcp::5529 -S -nographic -kernel bzImage-qemux86.bin -drive file=core-image-lsb-sdk-qemux86.ext3,if=virtio -enable-kvm -net none -usb -localtime --no-reboot --append "root=/dev/vda rw console=ttyS0 debug" \\
+			qemu-system-i386 -gdb tcp::5529 -S -nographic -kernel "arch/x86/boot/bzImage" \newline -drive file=core-image-lsb-sdk-qemux86.ext3,if=virtio -enable-kvm -net none -usb -localtime --no-reboot --append "root=/dev/vda rw console=ttyS0 debug" \\
 			
-			Gdb \\
+			In different terminal - Open 'gdb' \\
 			
 			(gdb) Target remote:5529 \\
 			
 			(gdb) continue \\
-			qemu-system-i386  \\
 			
 		\end{tabular}
 
@@ -122,21 +121,64 @@
 	
 	\textbf{-enable-KVM} : Enables KVM (Kernel Virtual Machine) for Linux. \\
 	
-	\textbf{-net none} : Enable the USB driver.
+	\textbf{-net none} : Enable the USB driver. \\
 	
-	\textbf{-localtime} : Use system local time.
+	\textbf{-localtime} : Use system local time. \\
 	
-	\textbf{--no-reboot} : Exit instead of rebooting.
+	\textbf{--no-reboot} : Exit instead of rebooting. \\
 	
-	\textbf{--append "root=/dev/vda rw console=ttyS0 debug"} : Allows for extra options in the kernel command line. 
-	
-	
+	\textbf{--append "root=/dev/vda rw console=ttyS0 debug"} : Allows for extra options in the kernel command line. \\
 	
 	\clearpage
 	\section{Version Control Log}
 	
-	\clearpage
-	\section{Work Log}
+\begin{center}
+ \begin{tabular}{||c c c c c||} 
+ \hline
+ Date & Commit & Insertions & Deletions & Message \\ [0.5ex] 
+ \hline\hline
+  10/5/16 & aababe0da9b6a2f88d4d771448854ca6c41f12ef & 18282136 & 0 & yocto! \\
+ \hline
+  10/5/16 & 063effe1f90dd2e7b97e8b8bdf5145f20ff44cfe & 3 & 0 & Create README.md \\
+ \hline
+  10/5/16 & ea4da8698f3836538def8cdf7673d19a7a700e3e & 41 & 0 & Add homework1 c \\
+ \hline
+  10/5/16 & afa6edf92fef7750844b858e4b98f7f42c96a841 & 210 & 8 & Add mt.h and modify homework1.c \\
+ \hline
+  10/5/16 & d0b44c238e2c4285b04dba1d1c63d23e5a719553 & 16 & 0 & Start doing Producer() \\
+ \hline
+  10/6/16 & 496310f187be10b620098e8682c8d49075c6394b & 56 & 4 & Group work late night session \\
+ \hline
+   10/7/16 & 21f928d426d4c052ce6301ffdc8a0768783ed4ee & 19 & 17 & Almost done, still buggy \\
+ \hline
+   10/9/16 & 3cb1a3713a54a1a10af60650826931208acf1e10 & 16 & 15 & Add pthread destroy because I forgot to do it \\
+ \hline
+   10/9/16 & e72d7993e808dad6678b0227e425f3cc05d6158d & 185 & 0 & Add files via upload - Clean up comments and display\\
+ \hline
+   10/9/16 & d04d2b85ef304db10f1502169b498d07ea0544f9 & 258 & 0 & Add files via upload - latex files rough draft\\
+ \hline
+   10/9/16 & d2def80fe95399cba7f72696a7ec78f59faf63dd & 54 & 30 & Fix!\\
+ \hline
+ 
+\end{tabular}
+\end{center}
+	
+\clearpage
+
+\section{Work Log}
+\begin{center}
+\begin{tabular}{ |m{2cm}|m{10cm}|m{2cm}| }
+\hline
+When & What & Duration \\ \hline
+10/4/2016 & We met for an hour at Kelly Computer Lab to discuss about the content of the assignments, the requirements to be done, and the method of programming that we are going to use. In the end, we decided that "Pair Programming" is the most efficient way for this first assignment. Furthermore, we also managed to get the overall concepts of  and kernel build. & 1 hours\\ \hline
+10/5/2016 & We had our second meeting at Kelly Computer Lab again. This time, we directly cloned the yocto repo and followed all the needed steps to run the kernel. We also set up github private repo to contain these OS2 FILES. It took us around 2 hours before we could move on with the concurrency assignment. We were able to start this concurrency assignment because we started from reading Kevin's sample code pthread\_hello, and from there we started to google about phtreads. & 3 hours\\ \hline
+10/6/2016 & We started to code producer and consumer functions because we thought that our concept was correct. With the help of different sources like: linux.die.org, pubs.opengroup.org, and stackoverflow, these two functions were done (well, sort of). & 4 hours\\ \hline
+10/7/2016 & We wanted to finish all the functions today because we're just missing main and signal handler function. However, we didn't expect that actually there were a lot of bugs when we ran the code as a whole. Thus, we ended up debugging all the errors for the rest of the meeting. & 3 hours\\ \hline
+10/8/2016 & We realized that the code is still buggy, but we remembered that documentation is also part of the assignment. Thus, we decided to learn LaTex by creating this document together. Arguably, today is a self-study LaTex session. & 2 hours\\ \hline
+10/9/2016 & We tried our best to fix and clean up our code so it is executable. After two hours of doing it, we felt that our current code is following Kevin's requirement already. Thus, we spend the rest of the time to finish up the LaTex documentation. & 4 hours\\
+\hline
+\end{tabular}
+\end{center}
 	
 
 	
