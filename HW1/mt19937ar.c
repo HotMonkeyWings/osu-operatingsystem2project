@@ -1,5 +1,4 @@
-/* C-program for MT19937, with initialization improved 2002/1/26.
-   Coded by Takuji Nishimura and Makoto Matsumoto.
+/*Coded by Takuji Nishimura and Makoto Matsumoto.
 
    Before using, initialize the state by using init_genrand(seed)  
    or init_by_array(init_key, key_length).
@@ -187,4 +186,5 @@ double genrand_res53(void)
 	}
 	return 0;
 }*/
+
 
