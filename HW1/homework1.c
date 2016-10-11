@@ -73,9 +73,10 @@ void *producer(void *arg){
 
 		printf("\n=========================================================== \n");
 		printf("I'm a producer!\n");
-		printf("Current index: %d/32, Value of produced item: %d," 
-			" Going to sleep for: %d seconds\n", bufferCounter - 1, 
-			producer.number, producerWait);
+		printf("Current index: %d/32, Value of produced item: %d,"
+			" Consumer will sleep for: %d seconds.\n"  
+			"Now I'm going to sleep for: %d seconds\n", bufferCounter - 1, 
+			producer.number, producer.waitPeriod, producerWait);
 
 		if(bufferCounter == 1) {
 			// Unlock the  thread
@@ -149,7 +150,7 @@ void *consumer(void *arg){
 			// Condition variable is blocked - consumer has to wait
 			pthread_cond_wait(&consumerWait,&mutex); 
 		}
-		
+	
 		pthread_mutex_unlock(&mutex);
 	}
 }
