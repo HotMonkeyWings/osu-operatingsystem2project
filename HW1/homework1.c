@@ -1,5 +1,4 @@
-/*
- *	CS 444 Assignment 1 - The Producer-Consumer Problem
+/*CS 444 Assignment 1 - The Producer-Consumer Problem
  *	By: Jonathan Harijanto and Kyle Martin Collins
  *
  *	Method: Pair programming	
@@ -73,11 +72,12 @@ void *producer(void *arg){
 
 		printf("\n=========================================================== \n");
 		printf("I'm a producer!\n");
-		printf("Current index: %d/32, Value of produced item: %d,"
+		printf("Current index: %d/31, Value of produced item: %d,"
 			" Consumer will sleep for: %d seconds.\n"  
 			"Now I'm going to sleep for: %d seconds\n", bufferCounter - 1, 
 			producer.number, producer.waitPeriod, producerWait);
 
+		//If bufferCounter is 1 then buffer previously had 0 items. Must unblock consumer so it can consume.
 		if(bufferCounter == 1) {
 			// Unlock the  thread
 			pthread_mutex_unlock(&mutex);
@@ -193,3 +193,4 @@ int main(){
 	pthread_cond_destroy(&theCons);
 	
 } 
+

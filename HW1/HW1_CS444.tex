@@ -19,19 +19,14 @@
 \usepackage{geometry}
 \geometry{textheight=8.5in, textwidth=6in}
 
-%random comment
 
 \newcommand{\cred}[1]{{\color{red}#1}}
 \newcommand{\cblue}[1]{{\color{blue}#1}}
 
 \newcommand{\toc}{\tableofcontents}
 
-%\usepackage{hyperref}
 
-\def\name{D. Kevin McGrath}
-
-%pull in the necessary preamble matter for pygments output
-%\input{pygments.tex}
+\def\name{Group 29}
 
 %% The following metadata will show up in the PDF properties
 %\hypersetup{
@@ -57,16 +52,15 @@
 		{\LARGE \today\par}
 		
 		{\LARGE Abstract\par}
-		Write stuff here when done with hw. 
+		The purpose of this paper is to describe the work involved in creating the Yocto Kernel and Producer-Consumer program. The Yocto Kernel is to be used for the
+		CS444 course taught by Professor Kevin McGrath at Oregon State University. The Producer-Consumer program was written in C and took advantage of POSIX threading.
+		This paper covers the commands used to create the Yocto Kernel as well as a brief description of relevant QEMU flags. Finally, this paper includes a section on
+		how the Producer-Consumer program was approached and completed. 
 		
 	\end{titlepage}
 	
 	\clearpage
 	\tableofcontents
-	
-	%input the pygmentized output of mt19937ar.c, using a (hopefully) unique name
-	%this file only exists at compile time. Feel free to change that.
-	
 	\clearpage
 	\section{Command Log}
 		\newcounter{rowcount}
@@ -108,7 +102,34 @@
 	\textbf{Reasoning For Assignment}\
 		The reasoning for this assignment is twofold. The first reason is to set up the virtual machine for later use in the class. Many of the future assignments in this class will make use of the VM and it is important to familiarize ourselves with it early so that we do not negatively impact the work of other groups and so that we can focus on the core lessons of those future assignments. The second reason for this assignment is to serve as an introduction to concurrency. Concurrency is an important concept in Computer Science as it allows for greater efficiency in certain tasks.\\
 		
-	 
+	\textbf{Design and Programming Approach}\
+		Our initial approach to the problem involved learning about multithreading. Using the class materials as a guide, specifically the pthread\_hello.c file,
+		we were able to view relevant documentation concerning POSIX threads. Once we created a simple producer-consumer program we moved on to tackling the assignment.
+		We modified our original program to include randomly generated sleep times for both the producer and consumer. In order to do this, we used the Mersenne Twister
+		random number generator. This was chosen over the rdrand random number generator because we will have to demo this program on os-class and os-class does not support
+		rdrand. The Mersenne Twister RNG was simple enough to understand and use. After the implementation of Mersenne Twister and the sleep period we encountered a scheduling
+		error. Through debugging we were able to discover that occasionaly the producer would wake up the consumer when the producer woke up from sleep. This meant that even when the
+		consumer was supposed to be sleeping as part of the "consumption" phase, if the producer woke up during the middle of this phase it would wake the consumer as well. We solved
+		this problem by moving our wait condition in the consumer to after the "consumption" phase. We also modified some of the logic in our program to better determine empty buffers
+		or a full buffer. By focusing on these areas we were able to resolve our scheduling errors. Finally, we had our last bug with the consumer displaying the wrong
+		value if the producer created a new item while the consumer slept. Essentially, the consumer was displaying the value of the item at the top of the stack
+		and not the value of the item it had actually consumed. To fix this, we created a temp structure to hold the appropiate values for the consumer. So when
+		the consumer began its "consumption" period it saved the appropiate values and displayed those instead of the values at the top of the stack. \\
+
+	\textbf{Testing Methodology} 
+		Our testing methodology was a combination of a automatic testing and manual testing. We also tested edge cases for an empty buffer and full buffer.
+		For manual testing we used hard coded sleep values for both the producer and consumer. We had cases where the producer would sleep longer than the consumer,
+		in which case the index would never increase past 0 because the consumer would always be ready to grab the next item. We had cases where the consumer would
+		sleep longer than the producer which would guarantee that the buffer would fill and the producer should become blocked. The result of these test cases showed
+		the bug described above where the consumer was printing the value at the top of the stack as opposed to the correct value. It is because of these manual tests
+		we were able to discover this bug. Automatic testing involved running the program for a long time and making note of the values that were consumed and produced.
+		In theory, if the program ran for long enough the buffer should fill at least once in which case the producer should be blocked. Using automatic testing we
+		were able to discover the bug involving the consumer waking up to soon.\\ 
+
+	\textbf{Lessons Learned}
+		We learned a great deal from this homework assignment. Aside from the POSIX commands and the Mersenne Twister commands needed to use this assignment we
+		learned how important scheduling was. A great deal of our initial bugs stemmed from scheduling errors which took quite some time to fix. This programming
+		assignment reinforced the importance of state-diagrams which had we used would have made this assignment much easier to complete.\\ 
 
 	
 	\clearpage
@@ -133,31 +154,35 @@
 	\section{Version Control Log}
 	
 \begin{center}
+<<<<<<< HEAD
 \begin{tabular}{ |m{2cm}|m{5cm}|m{1cm}|m{1cm}|m{5cm}| }
+=======
+ \begin{tabular}{| m{2cm} | m{5cm} | m{2cm} | m{2cm} | m{3cm} | } 
+>>>>>>> 69d27f0b363fef5f45180384096781e1c3811512
  \hline
  Date & Commit & Insertions & Deletions & Message \\ [0.5ex] 
  \hline\hline
-  10/5/16 & aababe0da9b6a2f88d4d771448854ca6c41f12ef & 18282136 & 0 & yocto! \\
+  10/5/16 & aababe0da9b6a2f88d 4d771448854ca6c41f12ef & 18282136 & 0 & yocto! \\
  \hline
-  10/5/16 & 063effe1f90dd2e7b97e8b8bdf5145f20ff44cfe & 3 & 0 & Create README.md \\
+  10/5/16 & 063effe1f90dd2e7b9 7e8b8bdf5145f20ff44cfe & 3 & 0 & Create README.md \\
  \hline
-  10/5/16 & ea4da8698f3836538def8cdf7673d19a7a700e3e & 41 & 0 & Add homework1 c \\
+  10/5/16 & ea4da8698f3836538d ef8cdf7673d19a7a700e3e & 41 & 0 & Add homework1 c \\
  \hline
-  10/5/16 & afa6edf92fef7750844b858e4b98f7f42c96a841 & 210 & 8 & Add mt.h and modify homework1.c \\
+  10/5/16 & afa6edf92fef775084 4b858e4b98f7f42c96a841 & 210 & 8 & Add mt.h and modify homework1.c \\
  \hline
-  10/5/16 & d0b44c238e2c4285b04dba1d1c63d23e5a719553 & 16 & 0 & Start doing Producer() \\
+  10/5/16 & d0b44c238e2c4285b0 4dba1d1c63d23e5a719553 & 16 & 0 & Start doing Producer() \\
  \hline
-  10/6/16 & 496310f187be10b620098e8682c8d49075c6394b & 56 & 4 & Group work late night session \\
+  10/6/16 & 496310f187be10b620 098e8682c8d49075c6394b & 56 & 4 & Group work late night session \\
  \hline
-   10/7/16 & 21f928d426d4c052ce6301ffdc8a0768783ed4ee & 19 & 17 & Almost done, still buggy \\
+   10/7/16 & 21f928d426d4c052c e6301ffdc8a0768783ed4ee & 19 & 17 & Almost done, still buggy \\
  \hline
-   10/9/16 & 3cb1a3713a54a1a10af60650826931208acf1e10 & 16 & 15 & Add pthread destroy because I forgot to do it \\
+   10/9/16 & 3cb1a3713a54a1a10 af60650826931208acf1e10 & 16 & 15 & Add pthread destroy because I forgot to do it \\
  \hline
-   10/9/16 & e72d7993e808dad6678b0227e425f3cc05d6158d & 185 & 0 & Add files via upload - Clean up comments and display\\
+   10/9/16 & e72d7993e808dad667 8b0227e425f3cc05d6158d & 185 & 0 & Add files via upload - Clean up comments and display\\
  \hline
-   10/9/16 & d04d2b85ef304db10f1502169b498d07ea0544f9 & 258 & 0 & Add files via upload - latex files rough draft\\
+   10/9/16 & d04d2b85ef304db10f 1502169b498d07ea0544f9 & 258 & 0 & Add files via upload - latex files rough draft\\
  \hline
-   10/9/16 & d2def80fe95399cba7f72696a7ec78f59faf63dd & 54 & 30 & Fix!\\
+   10/9/16 & d2def80fe95399cba7 f72696a7ec78f59faf63dd & 54 & 30 & Fix!\\
  \hline
  
 \end{tabular}
@@ -179,28 +204,5 @@ When & What & Duration \\ \hline
 \hline
 \end{tabular}
 \end{center}
-	
-
-	
-%	\subsection{blah}
-%	\subsubsection{yada yada}
-%	This is a paragraph in \LaTeX.
-	
-%	This is a new paragraph.
-	
-%	\begin{itemize}
-%		\item \begin{equation}
-%			\label{eq1}
-%			\int_0^\pi \sin(x) \partial x
-%		\end{equation}
-%		\item $\backslash$ As seen in Eq. \ref{eq1}, % blah blah blah
-%	\end{itemize}
-
-	
-%	\emph{\textbf{\color{red}This is italicized and red}}
-%	\tableofcontents
-	
-%	\section*{Appendix 1: Source Code}
-%	\input{__mt19937ar.c.tex}
-	
 \end{document}
+
