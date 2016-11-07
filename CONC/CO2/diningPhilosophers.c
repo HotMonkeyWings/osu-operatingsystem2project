@@ -54,11 +54,11 @@ int main() {
 	sem_init(&mutex,0,1);
 	
 	printf("--------------------------------\n");
-	printf("Philosopher 0 is Plato\n.");
-	printf("Philosopher 1 is Aristotle\n.");
-	printf("Philosopher 2 is Immanuel Kant\n.");
-	printf("Philosopher 3 is Socrates\n.");
-	printf("Philosopher 4 is John Locke\n.");
+	printf("Philosopher 0 is Plato.\n");
+	printf("Philosopher 1 is Aristotle.\n");
+	printf("Philosopher 2 is Immanuel Kant.\n");
+	printf("Philosopher 3 is Socrates.\n");
+	printf("Philosopher 4 is John Locke.\n");
 	printf("--------------------------------\n");
 
 	for(i=0; i<SIZE; i++){
