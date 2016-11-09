@@ -1,0 +1,153 @@
+\documentclass[letterpaper,10pt,draftclsnofoot,titlepage,onecolumn]{IEEEtran}
+
+\usepackage{graphicx}                                        
+\usepackage{amssymb}                                         
+\usepackage{amsmath}                                         
+\usepackage{amsthm}                                          
+
+\usepackage{alltt}                                           
+\usepackage{float}
+\usepackage{color}
+\usepackage{url}
+
+\usepackage{balance}
+\usepackage[TABBOTCAP, tight]{subfigure}
+\usepackage{enumitem}
+\usepackage{pstricks, pst-node}
+\usepackage{array}
+\usepackage{tabulary}
+
+\usepackage{geometry}
+\geometry{textheight=8.5in, textwidth=6in}
+
+
+\newcommand{\cred}[1]{{\color{red}#1}}
+\newcommand{\cblue}[1]{{\color{blue}#1}}
+
+\newcommand{\toc}{\tableofcontents}
+
+
+\def\name{Group 29}
+
+\parindent = 0.0 in
+\parskip = 0.1 in
+
+\begin{document}
+	
+	\begin{titlepage}
+		\centering
+		{\scshape\LARGE \textbf{CSS 444 HW 3 - The Kernel Crypto API}\par}
+		{\LARGE\itshape \textbf{Kyle Collins and Jonathan Harijanto}\par}
+		{\LARGE Fall 2016\par}
+		{\LARGE \today\par}
+		
+		{\LARGE Abstract\par}
+		WRITE SOMETHING HERE!
+		
+	\end{titlepage}
+	
+	\clearpage
+	\tableofcontents
+	
+	\clearpage
+	\section{Design Plan}
+	
+	WRITE SOMETHING HERE!
+
+	\clearpage
+	\section{Questions}
+	
+	\textbf{Reasoning For Assignment}\\
+		WRITE SOMETHING	
+		\\
+		
+	\textbf{Design and Programming Approach}\\
+		WRITE SOMETHING
+		\\
+
+	\textbf{Testing Methodology}\\
+		WRITE SOMETHING
+		\\ 
+
+	\textbf{Lessons Learned}\\
+		WRITE SOMETHING
+		\\
+
+	\clearpage
+
+	\section{Version Control Log}
+	
+\begin{center}
+
+ \begin{tabular}{| m{2cm} | m{8cm} | m{4cm} | } 
+\hline
+ Date & Commit & Message \\ [0.5ex] 
+ \hline\hline
+  10/5/16 & aababe0da9b6a2f88d4d771448854ca6c41f12ef & yocto! \\
+ \hline
+  10/5/16 & 063effe1f90dd2e7b97e8b8bd f5145f20ff44cfe & Create README.md \\
+ \hline
+  10/5/16 & ea4da8698f3836538def8cdf7 673d19a7a700e3e & Add homework1 c \\
+ \hline
+  10/5/16 & afa6edf92fef7750844b858e4 b98f7f42c96a841 & Add mt.h and modify homework1.c \\
+ \hline
+  10/5/16 & d0b44c238e2c4285b04dba1d1 c63d23e5a719553 & Start doing Producer() \\
+ \hline
+ 
+  10/6/16 & 496310f187be10b620098e868 2c8d49075c6394b & Group work late night session \\
+ \hline
+ 
+   10/7/16 & 21f928d426d4c052ce6301ff dc8a0768783ed4ee & Almost done, still buggy \\
+ \hline
+ 
+   10/9/16 & 3cb1a3713a54a1a10af60650 826931208acf1e10 & Add pthread destroy because I forgot to do it \\
+ \hline
+ 
+   10/9/16 & e72d7993e808dad6678b0227 e425f3cc05d6158d & Add files via upload - Clean up comments and display\\
+ \hline
+ 
+   10/9/16 & d04d2b85ef304db10f150216 9b498d07ea0544f9 & Add files via upload - latex files rough draft\\
+ \hline
+ 
+   10/9/16 & d2def80fe95399cba7f72696 a7ec78f59faf63dd & Fix!\\
+ \hline
+ 
+\end{tabular}
+\end{center}
+	
+\clearpage
+
+\section{Work Log}
+\begin{center}
+\begin{tabular}{ |m{2cm}|m{10cm}|m{2cm}| }
+\hline
+When & What & Duration \\ \hline
+10/18/2016 
+& We met at Kelly Computer Lab to discuss about the content of the assignments and the requirements to be done. We decided to implement "Pair Programming" again since both of us weren't familiar with the elevator concept at that time. We spent two hours to understand the different type of schedulers. 
+& 2 hours\\ 
+\hline
+
+10/20/2016 
+& We had a better understanding about the homework after we listened to some questions asked by classmates. Thus, after the class, we met a Kelly to create an algorithm for SSTF in a piece of paper. Furthermore, we also had to do some research about the noop-iosched code because it wasn't easy to read and understand every structs, pointers and variables in that code.  
+& 3 hours\\ 
+\hline
+
+10/21/2016 
+& We started to test our SSTF algorithm by modifying the copy of noop-iosched.c code. First, we changed every function name that has the word noop into sstf. Next, we modified the noop struct because sstf is going to need more variables.  In our design concept, we thought that the only function that needed major modification was the sstf\_dispatch. Thus we spent a lot of time trying to convert our algorithm into code carefully. We used the rest of our time to fix compile errors and do research to disable vitio.
+& 5 hours\\ 
+\hline
+
+10/22/2016 
+& We encountered a difficulty in enabling our scheduler into the virtual machine. We either got a kernel panic or received an error message when switching the scheduler.
+Since this is not a common problem, we were having a difficulty finding helpful information from the internet. Thus, we had to spend most of our time only to fix this issue. Being able to switch the scheduler is important to us because we wanted to know whether our SSTF code works or not. 
+& 5 hours\\ 
+\hline
+
+10/23/2016 
+& We tried to fix the virtual machine issue and make a modification to any logic error in our SSTF code. After several hours of doing it, we felt that the current code has met the assignment requirements. Thus, we continued by creating a patch file and writing the LaTex documentation.
+& 5 hours\\
+\hline
+\end{tabular}
+\end{center}
+\end{document}
+

@@ -135,6 +135,10 @@ static int __init sbd_init(void) {
 		return -ENOMEM;
 	/*
 	 * Get a request queue.
+	 *
+	 * blk_init_queue allocates and initializes a spinlock. 
+	 * 
+	 *
 	 */
 	Queue = blk_init_queue(sbd_request, &Device.lock);
 	if (Queue == NULL)
@@ -144,6 +148,25 @@ static int __init sbd_init(void) {
 	 * Get registered.
 	 */
 	major_num = register_blkdev(major_num, "sbd");
+	
+	/*register_blkdev takes a major number as input and the name of the new block device. 
+  	If the inputted major number is 0 then a new major number will be allocated and returned.
+  	If the inputted major number is not 0 then 0 will be returned on success.
+  	If there was an error in registering the new block device then a negative value will be returned.
+  	Major numbers represent the driver that is associated with the device.
+ 
+ 	Per documentation
+	block	RAM disk
+		  0 = /dev/ram0		First RAM disk
+		  1 = /dev/ram1		Second RAM disk
+		    ...
+		250 = /dev/initrd	Initial RAM disk
+
+		Older kernels had /dev/ramdisk (1, 1) here.
+		/dev/initrd refers to a RAM disk which was preloaded
+		by the boot loader; newer kernels use /dev/ram0 for
+		the initrd.*/
+	
 	if (major_num < 0) {
 		printk(KERN_WARNING "sbd: unable to get major number\n");
 		goto out;
@@ -152,6 +175,7 @@ static int __init sbd_init(void) {
 	 * And the gendisk structure.
 	 */
 	Device.gd = alloc_disk(16);
+
 	if (!Device.gd)
 		goto out_unregister;
 	Device.gd->major = major_num;
