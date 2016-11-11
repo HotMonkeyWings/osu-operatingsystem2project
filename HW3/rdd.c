@@ -12,7 +12,8 @@
  *	Resources:
  *	http://lwn.net/Kernel/LDD3/
  *	http://blog.superpat.com/2010/05/04/a-simple-block-driver-for-linux-kernel-2-6-31/	
- *	
+ *	http://lxr.free-electrons.com/source/include/linux/crypto.h 
+ *	http://lxr.free-electrons.com/source/Documentation/crypto/api-intro.txt
  *
  */
 
@@ -28,9 +29,15 @@
 #include <linux/genhd.h>
 #include <linux/blkdev.h>
 #include <linux/hdreg.h>
+#include <linux/crypto.h>
+
 
 MODULE_LICENSE("Dual BSD/GPL");
 static char *Version = "1.4";
+
+// Our note:
+// Module param takes variable name, its type and permission.
+// Allow arguments to be passed to your module
 
 static int major_num = 0;
 module_param(major_num, int, 0);
@@ -45,6 +52,11 @@ module_param(nsectors, int, 0);
  */
 #define KERNEL_SECTOR_SIZE 512
 
+static char *KEY = "harambeharambeha";
+static int KEYLEN = 16;
+struct crypto_cipher *tfm;
+
+
 /*
  * Our request queue.
  */
@@ -53,7 +65,7 @@ static struct request_queue *Queue;
 /*
  * The internal representation of our device.
  */
-static struct sbd_device {
+static struct rdd_device {
 	unsigned long size;
 	spinlock_t lock;
 	u8 *data;
@@ -63,22 +75,41 @@ static struct sbd_device {
 /*
  * Handle an I/O request.
  */
-static void sbd_transfer(struct sbd_device *dev, sector_t sector,
+
+// Data Transfer
+static void rdd_transfer(struct rdd_device *dev, sector_t sector,
 		unsigned long nsect, char *buffer, int write) {
 	unsigned long offset = sector * logical_block_size;
 	unsigned long nbytes = nsect * logical_block_size;
-
+	unsigned long block_size = crypto_cipher_blocksize(tfm);
+	int i;
+	crypto_cipher_setkey(tfm,KEY,KEYLEN);
 	if ((offset + nbytes) > dev->size) {
-		printk (KERN_NOTICE "sbd: Beyond-end write (%ld %ld)\n", offset, nbytes);
+		printk (KERN_NOTICE "rdd: Beyond-end write (%ld %ld)\n", offset, nbytes);
 		return;
 	}
-	if (write)
-		memcpy(dev->data + offset, buffer, nbytes);
-	else
-		memcpy(buffer, dev->data + offset, nbytes);
+	if (write) {
+		// ***insert encrypt here.
+		u8 *destination = dev->data + offset;
+		u8 *source = buffer;
+		for(i = 0; i < nbytes; i+=block_size)
+		{	 
+			crypto_cipher_encrypt_one(tfm, destination + i, source + i);
+		//	memcpy(dev->data + offset, buffer, nbytes);
+		}
+	} else 	{
+		u8 *source = dev->data + offset;
+		u8 *destination = buffer;
+		for(i = 0; i < nbytes; i+=block_size)
+		{	 
+			crypto_cipher_decrypt_one(tfm, destination + i, source + i);
+		}
+	//		memcpy(buffer, dev->data + offset, nbytes);
+	}
 }
 
-static void sbd_request(struct request_queue *q) {
+// Specify the request function to handle entries in request queue
+static void rdd_request(struct request_queue *q) {
 	struct request *req;
 
 	req = blk_fetch_request(q);
@@ -91,7 +122,7 @@ static void sbd_request(struct request_queue *q) {
 			__blk_end_request_all(req, -EIO);
 			continue;
 		}
-		sbd_transfer(&Device, blk_rq_pos(req), blk_rq_cur_sectors(req),
+		rdd_transfer(&Device, blk_rq_pos(req), blk_rq_cur_sectors(req),
 				req->buffer, rq_data_dir(req));
 		if ( ! __blk_end_request_cur(req, 0) ) {
 			req = blk_fetch_request(q);
@@ -104,7 +135,7 @@ static void sbd_request(struct request_queue *q) {
  * calls this. We need to implement getgeo, since we can't
  * use tools such as fdisk to partition the drive otherwise.
  */
-int sbd_getgeo(struct block_device * block_device, struct hd_geometry * geo) {
+int rdd_getgeo(struct block_device * block_device, struct hd_geometry * geo) {
 	long size;
 
 	/* We have no real geometry, of course, so make something up. */
@@ -119,15 +150,16 @@ int sbd_getgeo(struct block_device * block_device, struct hd_geometry * geo) {
 /*
  * The device operations structure.
  */
-static struct block_device_operations sbd_ops = {
+static struct block_device_operations rdd_ops = {
 		.owner  = THIS_MODULE,
-		.getgeo = sbd_getgeo
+		.getgeo = rdd_getgeo
 };
 
-static int __init sbd_init(void) {
+static int __init rdd_init(void) {
 	/*
 	 * Set up our internal device.
 	 */
+	tfm = crypto_alloc_cipher("sha1",0,0);
 	Device.size = nsectors * logical_block_size;
 	spin_lock_init(&Device.lock);
 	Device.data = vmalloc(Device.size);
@@ -140,15 +172,15 @@ static int __init sbd_init(void) {
 	 * 
 	 *
 	 */
-	Queue = blk_init_queue(sbd_request, &Device.lock);
+	Queue = blk_init_queue(rdd_request, &Device.lock);
 	if (Queue == NULL)
 		goto out;
 	blk_queue_logical_block_size(Queue, logical_block_size);
 	/*
 	 * Get registered.
 	 */
-	major_num = register_blkdev(major_num, "sbd");
-	
+	major_num = register_blkdev(major_num, "rdd");
+
 	/*register_blkdev takes a major number as input and the name of the new block device. 
   	If the inputted major number is 0 then a new major number will be allocated and returned.
   	If the inputted major number is not 0 then 0 will be returned on success.
@@ -168,7 +200,7 @@ static int __init sbd_init(void) {
 		the initrd.*/
 	
 	if (major_num < 0) {
-		printk(KERN_WARNING "sbd: unable to get major number\n");
+		printk(KERN_WARNING "rdd: unable to get major number\n");
 		goto out;
 	}
 	/*
@@ -180,9 +212,9 @@ static int __init sbd_init(void) {
 		goto out_unregister;
 	Device.gd->major = major_num;
 	Device.gd->first_minor = 0;
-	Device.gd->fops = &sbd_ops;
+	Device.gd->fops = &rdd_ops;
 	Device.gd->private_data = &Device;
-	strcpy(Device.gd->disk_name, "sbd0");
+	strcpy(Device.gd->disk_name, "rdd0");
 	set_capacity(Device.gd, nsectors);
 	Device.gd->queue = Queue;
 	add_disk(Device.gd);
@@ -190,20 +222,22 @@ static int __init sbd_init(void) {
 	return 0;
 
 out_unregister:
-	unregister_blkdev(major_num, "sbd");
+	unregister_blkdev(major_num, "rdd");
 out:
 	vfree(Device.data);
 	return -ENOMEM;
 }
 
-static void __exit sbd_exit(void)
+// Cleanup
+static void __exit rdd_exit(void)
 {
+	crypto_free_cipher(tfm);
 	del_gendisk(Device.gd);
 	put_disk(Device.gd);
-	unregister_blkdev(major_num, "sbd");
+	unregister_blkdev(major_num, "rdd");
 	blk_cleanup_queue(Queue);
 	vfree(Device.data);
 }
 
-module_init(sbd_init);
-module_exit(sbd_exit);
+module_init(rdd_init);
+module_exit(rdd_exit);
