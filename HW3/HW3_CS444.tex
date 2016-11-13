@@ -41,8 +41,13 @@
 		{\LARGE Fall 2016\par}
 		{\LARGE \today\par}
 		
-		{\LARGE Abstract\par}
-		WRITE SOMETHING HERE!
+	\vfill		
+		
+		\begin{abstract}
+The purpose of this paper is describe the process of creating an encrypted RAM Disk device driver for an Linux virtual machine, specifically Yocto Linux. 
+This paper will cover the design methodology for the driver, implementation of the driver into the virtual machine, testing methodology for the driver, and the knowledge that was gained from completing this project. 
+Additionally, this project contains a work log that illustrates time spent on the project and a version control log that documents progress made.
+ 		\end{abstract}
 		
 	\end{titlepage}
 	
@@ -52,25 +57,56 @@
 	\clearpage
 	\section{Design Plan}
 	
-	WRITE SOMETHING HERE!
+We began this project by identifying the appropriate steps we would need to take in order to build the encrypted RAM Disk device driver and implement it into the virtual machine. 
+The steps we identified were as follows.
+ 	 
+ 	 \begin{enumerate}
+ 	 	\item Learn about RAM disk device drivers.
+ 	 	\item Create a new RAM disk device driver module. 
+ 	 	\item Learn how to incorporate the new module into the virtual machine.
+ 	 	\item Load the module into the virtual machine.
+ 		\item Test the new module.
+ 	 	\item Learn about the Linux Cryptographic API.
+ 	 	\item Implement the Linux Cryptographic
+ 	 	\item Final test of the new module.
+ 	 \end{enumerate}
+ 
+By following these steps we were able to build the new driver and insert it as a module into the virtual machine. 
+Further details on the design of the driver and the cryptography associated with it can be found in the Design and Programming Approach section and the tests we conducted can be found in the Testing Methodology section. \\
+
 
 	\clearpage
 	\section{Questions}
 	
 	\textbf{Reasoning For Assignment}\\
-		WRITE SOMETHING	
-		\\
+The motivation behind this assignment was to introduce students to modules in Linux, familiarize students with the RAM disk device driver, and acquaint students with the Linux Crypto API. 	
 		
 	\textbf{Design and Programming Approach}\\
-		WRITE SOMETHING
-		\\
+For the design of the RAM Disk Device without cryptography we followed the steps outlined by Pat Patterson. 
+He provided a working copy of a RAM Disk Device Block Driver which we used for our project. 
+For the cryptographic implementation, we referred to the documentation provided by kernel.org on the Linux Crypto API. 
+Initially, we attempted to base our cryptographic implementation based on the tcrypt file found in our linux yocto directory. 
+However, the API used in this file was from the Synchronous Block Cipher which has been deprecated. 
+Further research led us to the Single Block Cipher API and the kernel.org documentation which we used to implement cryptography.
 
 	\textbf{Testing Methodology}\\
-		WRITE SOMETHING
-		\\ 
-
+		\textbf{RAM Disk Device Driver - Without Crypto}
+ 		After creating the appropriate file and editing the appropriate Makefile and Kconfig for our new module, we validated its correctness by ensuring the virtual machine would accept the new module. 
+ 		We did this by using the command insmod filename to load the module into our virtual machine. 
+ 		We then attempted to partition the new RAM Disk and mount it. 
+ 		Finally, we created a new file on the RAM Disk before unmounting and removing the module.
+ 		
+ 		\textbf{RAM Disk Device Driver - With Crypto}
+ 		For the most part we followed the same methodology as above with a few slight differences. 
+ 		The new Ram Disk Device Driver contained multiple print kernel statements that allowed us to view block data before encryption, after encryption, and after decryption. 
+ 		We compared the unencrypted data to the decrypted data to determine the validity of our module. 
+ 		If the unencrypted data did not match the decrypted data we would know there was a bug in our program. 
+ 		\\ 
 	\textbf{Lessons Learned}\\
-		WRITE SOMETHING
+This homework assignment taught us about modules, RAM disk device drivers, and how to make use of the Cryptographic API in Linux. 
+Perhaps most importantly, we learned how effective it is to plan ahead on projects for which we lack familiarity. 
+Apart from some trouble with incorporating the newly created module into Linux, we were able to follow the steps we outlined in our first meeting with little issue. 
+By breaking the project up into sub-problems we were able to easily identify what we needed to get done, how to go about completing the sub-problem, and compare our current progress to our intended progress.
 		\\
 
 	\clearpage
@@ -79,41 +115,24 @@
 	
 \begin{center}
 
- \begin{tabular}{| m{2cm} | m{8cm} | m{4cm} | } 
+\begin{tabular}{| m{2cm} | m{8cm} | m{4cm} | } 
 \hline
  Date & Commit & Message \\ [0.5ex] 
  \hline\hline
-  10/5/16 & aababe0da9b6a2f88d4d771448854ca6c41f12ef & yocto! \\
+  2016-11-12 & a49ccdc & Fix bug. Encrypt kinda weird. \\
  \hline
-  10/5/16 & 063effe1f90dd2e7b97e8b8bd f5145f20ff44cfe & Create README.md \\
+  2016-11-11 & 736a912 & Add encryption - buggy \\
  \hline
-  10/5/16 & ea4da8698f3836538def8cdf7 673d19a7a700e3e & Add homework1 c \\
+  2016-11-09 & 49370f4 & Add tex template \\
  \hline
-  10/5/16 & afa6edf92fef7750844b858e4 b98f7f42c96a841 & Add mt.h and modify homework1.c \\
- \hline
-  10/5/16 & d0b44c238e2c4285b04dba1d1 c63d23e5a719553 & Start doing Producer() \\
- \hline
- 
-  10/6/16 & 496310f187be10b620098e868 2c8d49075c6394b & Group work late night session \\
- \hline
- 
-   10/7/16 & 21f928d426d4c052ce6301ff dc8a0768783ed4ee & Almost done, still buggy \\
- \hline
- 
-   10/9/16 & 3cb1a3713a54a1a10af60650 826931208acf1e10 & Add pthread destroy because I forgot to do it \\
- \hline
- 
-   10/9/16 & e72d7993e808dad6678b0227 e425f3cc05d6158d & Add files via upload - Clean up comments and display\\
- \hline
- 
-   10/9/16 & d04d2b85ef304db10f150216 9b498d07ea0544f9 & Add files via upload - latex files rough draft\\
- \hline
- 
-   10/9/16 & d2def80fe95399cba7f72696 a7ec78f59faf63dd & Fix!\\
+   2016-11-02 & 599d4b5 & Add rdd.c skeleton code \\
  \hline
  
 \end{tabular}
+
 \end{center}
+\hfill\\
+N.B. We are using: git log --pretty=format:"\%h \%ad\%x09\%an\%x09\%s" --date=short
 	
 \clearpage
 
@@ -122,31 +141,33 @@
 \begin{tabular}{ |m{2cm}|m{10cm}|m{2cm}| }
 \hline
 When & What & Duration \\ \hline
-10/18/2016 
-& We met at Kelly Computer Lab to discuss about the content of the assignments and the requirements to be done. We decided to implement "Pair Programming" again since both of us weren't familiar with the elevator concept at that time. We spent two hours to understand the different type of schedulers. 
-& 2 hours\\ 
-\hline
-
-10/20/2016 
-& We had a better understanding about the homework after we listened to some questions asked by classmates. Thus, after the class, we met a Kelly to create an algorithm for SSTF in a piece of paper. Furthermore, we also had to do some research about the noop-iosched code because it wasn't easy to read and understand every structs, pointers and variables in that code.  
+11/3/2016
+& Met at KEC to discuss the project and identify what needed to be done to complete the project. 
+We also researched information about Linux RAM disk device drivers and started working on the code for the assignment.
 & 3 hours\\ 
 \hline
 
-10/21/2016 
-& We started to test our SSTF algorithm by modifying the copy of noop-iosched.c code. First, we changed every function name that has the word noop into sstf. Next, we modified the noop struct because sstf is going to need more variables.  In our design concept, we thought that the only function that needed major modification was the sstf\_dispatch. Thus we spent a lot of time trying to convert our algorithm into code carefully. We used the rest of our time to fix compile errors and do research to disable vitio.
-& 5 hours\\ 
+11/7/2016 
+& Using several resources we discovered online we created the first version of our module. 
+We spent additional time attempting to implement the module into the virtual machine. 
+& 3 hours\\ 
 \hline
 
-10/22/2016 
-& We encountered a difficulty in enabling our scheduler into the virtual machine. We either got a kernel panic or received an error message when switching the scheduler.
-Since this is not a common problem, we were having a difficulty finding helpful information from the internet. Thus, we had to spend most of our time only to fix this issue. Being able to switch the scheduler is important to us because we wanted to know whether our SSTF code works or not. 
-& 5 hours\\ 
+11/9/2016 
+& Based on advice from Professor McGrath we were finally able to incorporate the module into the virtual machine and run our tests.
+& 4 hours\\ 
 \hline
 
-10/23/2016 
-& We tried to fix the virtual machine issue and make a modification to any logic error in our SSTF code. After several hours of doing it, we felt that the current code has met the assignment requirements. Thus, we continued by creating a patch file and writing the LaTex documentation.
-& 5 hours\\
+11/11/2016 
+& Researched the Linux Cryptographic API and based on its documentation we were able to implement an updated version of our module, this time with cryptography, into our virtual machine. 
+& 3 hours\\ 
 \hline
+
+11/12/2016 
+& Tested the cryptographic API and worked on fixing a bug with the decryption portion of our module.
+& 3 hours\\
+\hline
+
 \end{tabular}
 \end{center}
 \end{document}
