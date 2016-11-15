@@ -1,3 +1,17 @@
+/*
+ *	CS 444 HW 3 - Encrypted Block Device	
+ *	By Jonathan and Kyle
+ *	Method: Pair Programming
+ *
+ *	Sources: 
+ *	crypto/tcrypt.c
+ *	http://kernel.readthedocs.io/en/sphinx-samples/crypto-API.html?highlight=crypto_cipher_setkey#introduction
+ *	http://lxr.free-electrons.com/source/include/linux/crypto.h 
+ *	http://lxr.free-electrons.com/source/Documentation/crypto/api-intro.txt
+ *	
+ *	Skeleton code from http://blog.superpat.com/2010/05/04/a-simple-block-driver-for-linux-kernel-2-6-31/
+ */
+
 #include <linux/module.h>
 #include <linux/moduleparam.h>
 #include <linux/init.h>
@@ -60,10 +74,11 @@ static void sbd_transfer(struct sbd_device *dev, sector_t sector,
 	unsigned long offset = sector * logical_block_size;
 	unsigned long nbytes = nsect * logical_block_size;
 
-	/* HW3 */
+	// JOHN-KYLE CODE
 	u8 *source;
 	u8 *destination;
-	tfm = crypto_alloc_cipher("aes", 4, CRYPTO_ALG_ASYNC);
+//	u8 *dest2 = vmalloc(dev->size);
+//	u8 *src2;
 	unsigned int perBlock = crypto_cipher_blocksize(tfm);
 	crypto_cipher_setkey(tfm, charkey, key_length);
 
@@ -72,37 +87,52 @@ static void sbd_transfer(struct sbd_device *dev, sector_t sector,
 		return;
 	}
 	if (write){
+		// JOHN-KYLE CODE
 		source = buffer;
 		destination = dev->data + offset;
 	
-		for(i = 0; i < nbytes; i += perBlock){
-			crypto_cipher_encrypt_one(tfm, destination + i, source + i);
-		}
 		printk("\n [WRITE] Decrypted (ORIGINAL) Data:\n");
 		for(i = 0; i < nbytes; i++){
 			printk("%02x", (unsigned char)*source++);
 		}
+		for(i = 0; i < nbytes; i += perBlock){
+			crypto_cipher_encrypt_one(tfm, destination + i, source + i);
+//			crypto_cipher_decrypt_one(tfm, dest2+i, destination + i);
+		}
 		printk("\n [WRITE] Encrypted Data:\n");
 		for(i = 0; i < nbytes; i++){
-			printk("%02x", (unsigned char)*destination);
-		}
+			printk("%02x", (unsigned char)*destination++);
+		}	
+//		printk("\n [WRITE] Decrypted (Literally Decrypted) Data:\n");
+//		for(i = 0; i < nbytes; i++){
+//			printk("%02x", (unsigned char)*dest2++);
+//		}
+
+
 	}
+	
 	else{
 		source = dev->data + offset;
 		destination = buffer;
 
-		for(i = 0; i < nbytes; i += perBlock){
-			crypto_cipher_decrypt_one(tfm, destination + i, source + i);
-		}
-
-		printk("\n [READ] Decrypted (ORIGINAL) Data:\n");
+		printk("\n [READ] Encrypted (ORIGINAL) Data:\n");
 		for(i = 0; i < nbytes; i++){
 			printk("%02x", (unsigned char)*source++);
 		}
-		printk("\n [READ] Encrypted Data:\n");
-		for(i = 0; i < nbytes; i++){
-			printk("%02x", (unsigned char)*destination);
+		for(i = 0; i < nbytes; i += perBlock){
+			crypto_cipher_decrypt_one(tfm, destination + i, source + i);
+//fix here kernel null pointer dereference eip EIP: 0060:[<c1344ffc>] EFLAGS: 00010002 CPU: 0
+//EIP is at aes_encrypt+0xd1c/0xd50
+//			crypto_cipher_encrypt_one(tfm, dest2 +i, destination + i);
 		}
+		printk("\n [READ] Decrypted Data:\n");
+		for(i = 0; i < nbytes; i++){
+			printk("%02x", (unsigned char)*destination++);
+		}
+//		printk("\n [READ] Rencrypted (Based on decrypted data. Should match above Encrypted.) Data:\n");
+//		for(i = 0; i < nbytes; i++){
+//			printk("%02x", (unsigned char)*dest2++);
+// 		}
 	}
 }
 
@@ -154,6 +184,7 @@ static struct block_device_operations sbd_ops = {
 
 static int __init sbd_init(void) {
 
+	tfm = crypto_alloc_cipher("aes", 4, CRYPTO_ALG_ASYNC);
 	/*
 	 * Set up our internal device.
 	 */
@@ -203,7 +234,7 @@ out:
 
 static void __exit sbd_exit(void)
 {
-	// HW 3
+	// JOHN-KYLE CODE
 	crypto_free_cipher(tfm);
 	del_gendisk(Device.gd);
 	put_disk(Device.gd);
