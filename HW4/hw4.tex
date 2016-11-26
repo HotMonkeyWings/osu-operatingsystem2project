@@ -1,0 +1,141 @@
+\documentclass[letterpaper,10pt,draftclsnofoot,titlepage,onecolumn]{IEEEtran}
+
+\usepackage{graphicx}                                        
+\usepackage{amssymb}                                         
+\usepackage{amsmath}                                         
+\usepackage{amsthm}                                          
+
+\usepackage{alltt}                                           
+\usepackage{float}
+\usepackage{color}
+\usepackage{url}
+
+\usepackage{balance}
+\usepackage[TABBOTCAP, tight]{subfigure}
+\usepackage{enumitem}
+\usepackage{pstricks, pst-node}
+\usepackage{array}
+\usepackage{tabulary}
+
+\usepackage{geometry}
+\geometry{textheight=8.5in, textwidth=6in}
+
+
+\newcommand{\cred}[1]{{\color{red}#1}}
+\newcommand{\cblue}[1]{{\color{blue}#1}}
+
+\newcommand{\toc}{\tableofcontents}
+
+
+\def\name{Group 29}
+
+\parindent = 0.0 in
+\parskip = 0.1 in
+
+\begin{document}
+	
+	\begin{titlepage}
+		\centering
+		{\scshape\LARGE \textbf{CSS 444 HW 4 - The SLOB SLAB}\par}
+		{\LARGE\itshape \textbf{Kyle Collins and Jonathan Harijanto}\par}
+		{\LARGE Fall 2016\par}
+		{\LARGE \today\par}
+		
+	\vfill		
+		
+\begin{abstract}
+The purpose of this paper is 
+\end{abstract}
+		
+\end{titlepage}
+	
+\clearpage
+\tableofcontents
+	
+\clearpage
+\section{Design Plan}
+ 	 
+\begin{enumerate}
+\item x1
+\end{enumerate}
+ 
+\clearpage
+	\section{Questions}
+	
+	\textbf{Reasoning For Assignment}\\
+
+		
+	\textbf{Design and Programming Approach}\\
+
+
+	\textbf{Testing Methodology}\\
+
+
+	\textbf{Lessons Learned}\\
+
+	\clearpage
+
+	\section{Version Control Log}
+	
+\begin{center}
+
+\begin{tabular}{| m{2cm} | m{8cm} | m{4cm} | } 
+\hline
+ Date & Commit & Message \\ [0.5ex] 
+ \hline\hline
+2016-11-13 &  &  \\
+ \hline 
+  2016-11-12 &  & \\
+ \hline
+  2016-11-11 &  &  \\
+ \hline
+  2016-11-09 &  &  \\
+ \hline
+   2016-11-02 &  &  \\
+ \hline
+ 
+\end{tabular}
+
+\end{center}
+\hfill\\
+N.B. We are using: git log --pretty=format:"\%h \%ad\%x09\%an\%x09\%s" --date=short
+	
+\clearpage
+
+\section{Work Log}
+\begin{center}
+\begin{tabular}{ |m{2cm}|m{10cm}|m{2cm}| }
+\hline
+When & What & Duration \\ \hline
+11/22/2016
+& We met at Kelley computer lab to discuss and identify what needed to be done to complete the project. 
+Also, we did some research about SLOB from the internet and Linux Kernel Development book.
+At the end of the meeting, both of us understood the basic concept of SLOB.
+& 2 hours\\ 
+\hline
+
+11/23/2016 
+& We decided to take a look at the slob.c file. 
+We also made our first commit because we are going to use the original slob.c file as our template.
+Lastly, we spent the last one hour to add memory usage system call and change the algorithm in the slob.c file.
+& 2 hours\\ 
+\hline
+
+11/26/2016 
+& We're still not sure with our best-fit algorithm, but we decided to test it anyway. 
+Thus, we started to write c file that could test memory fragmentation. 
+Furthermore, we modified the kernel configuration so it will use SLOB instead of SLAB.
+& 2 hours\\ 
+\hline
+
+11/27/2016 
+& We added and removed few lines of code in our slob.c because we noticed some logical error
+during the execution.
+After we are finished with the code, we started to write the document and answer the questions.
+& 3 hours\\ 
+\hline
+
+\end{tabular}
+\end{center}
+\end{document}
+
