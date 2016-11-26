@@ -1,7 +1,13 @@
 /*
- * SLOB Allocator: Simple List Of Blocks
+ * 	CS444 HW 4: THE SLOB SLAB
+ * 	By Jonathan and Kyle
  *
- * 	THIS IS THE BEST FIT ALGORITHM VERSION
+ *	Method: Pair Programming
+ *
+ *	Resources:
+ *	
+ *
+ * 	SLOB BEST FIT ALGORITHM
  *
  */
 
@@ -35,6 +41,10 @@ typedef s16 slobidx_t;
 #else
 typedef s32 slobidx_t;
 #endif
+
+// group29's code
+int claimedMemory = 0;
+int usedMemory = 0;
 
 struct slob_block {
 	slobidx_t units;
@@ -591,4 +601,23 @@ void __init kmem_cache_init(void)
 void __init kmem_cache_init_late(void)
 {
 	slab_state = FULL;
+}
+
+// ************* Write separate system calls at the bottom of mm/slob.c 
+// to return each of these
+// amounts in bytes and as an unsigned int *********
+
+// Comparing the values returned by each of these functions will give 
+// you some idea of the degree of fragmentation suffered by SLOB. 
+// Write a simple program that uses these two syscalls to make this comparison.
+
+// asmlinkage: tells your compiler to look on the CPU stack for 
+// the function parameters, instead of registers.
+
+asmlinkage long sys_get_slob_amt_claimed(void){
+	return claimedMemory;
+}
+
+asmlinkage long sys_get_slob_amt_free(void){
+	return claimedMemory - usedMemory;
 }
