@@ -28,6 +28,7 @@
 #include <linux/atomic.h>
 
 #include "slab.h"
+
 /*
  * slob_block has a field 'units', which indicates size of block if +ve,
  * or offset of next block if -ve (in SLOB_UNITs).
@@ -36,6 +37,7 @@
  * Those with larger size contain their size in the first SLOB_UNIT of
  * memory, and the offset of the next free block in the second SLOB_UNIT.
  */
+
 #if PAGE_SIZE <= (32767 * 2)
 typedef s16 slobidx_t;
 #else
@@ -257,8 +259,13 @@ static void *slob_alloc(size_t size, gfp_t gfp, int align, int node)
 		/* Attempt to alloc */
 		prev = sp->list.prev;
 		b = slob_page_alloc(sp, size, align);
-		if (!b)
+	
+		// group 29's code
+		if (!b){
 			continue;
+		} else {
+			usedMemory = usedMemory + size;
+		}
 
 		/* Improve fragment distribution and reduce our average
 		 * search time by starting our next search here. (see
@@ -287,6 +294,8 @@ static void *slob_alloc(size_t size, gfp_t gfp, int align, int node)
 		b = slob_page_alloc(sp, size, align);
 		BUG_ON(!b);
 		spin_unlock_irqrestore(&slob_lock, flags);
+		// group 29's code
+		claimedMemory = claimedMemory + PAGE_SIZE;
 	}
 	if (unlikely((gfp & __GFP_ZERO) && b))
 		memset(b, 0, size);
@@ -311,9 +320,16 @@ static void slob_free(void *block, int size)
 	sp = virt_to_page(block);
 	units = SLOB_UNITS(size);
 
+	// group 29's code
+	usedMemory = usedMemory - size;
+
 	spin_lock_irqsave(&slob_lock, flags);
 
 	if (sp->units + units == SLOB_UNITS(PAGE_SIZE)) {
+
+		// group 29's code
+		claimedMemory = claimedMemory + PAGE_SIZE;		
+
 		/* Go directly to page allocator. Do not pass slob allocator */
 		if (slob_page_free(sp))
 			clear_slob_page_free(sp);
