@@ -44,7 +44,7 @@
 	\vfill		
 		
 \begin{abstract}
-The purpose of this paper is 
+The purpose of this paper is to describe the design and implementation of the SLOB Best Fit Algorithim for the default yocto Linux kernel as well as the testing methodology used to compare the efficiency of the Best Fit Algorithim to the First-Fit algorithim. This paper will also cover the reasoning for the assignment, lessons learned, and the work/commit log for this assignment. 
 \end{abstract}
 		
 \end{titlepage}
@@ -54,24 +54,43 @@ The purpose of this paper is
 	
 \clearpage
 \section{Design Plan}
- 	 
-\begin{enumerate}
-\item x1
-\end{enumerate}
+
+	Our plan to approach this assignment is as follows. First, we will examine the original First-Fit algorithim as well as the SLOB code in the slob.c file to understand what is occuring and better design our algorithim. We will then create a pseudo-code Best-Fit algorithim and from that implement it into a new slob.c file. From there, we will implement the new slob.c file into our virtual machine. We will then test the new slob.c file to ensure that it is running properly. Finally, we will construct a test file that will be used to compare the space efficieny of the algorithim. We will log the results of the test file and include them in our report and state any noticable differences or observations between the two algorithims. 
  
 \clearpage
 	\section{Questions}
 	
 	\textbf{Reasoning For Assignment}\\
+	
+	The reasoning for this assignment is to familarize the student with memory allocation in Linux, specifically the SLOB SLOB, as well general memory allocation algorithims. Additionally, the testing and comparison of the space efficiency of the two algorithims will provide the student with the opportunity to better understand the impact that poorly constructed memory allocation algorithims can have on a system. 
 
 		
 	\textbf{Design and Programming Approach}\\
 
+	As stated previously, the inital approach was to examine the original slob.c file. From there, we determined that the appropiate algorithimic modifications should be made in the *slob\_alloc function. This is the function that actually allocates available memory for use. We then designed a brute force alogorithim to be used to determine the best fit for a given set of data when given a list of possible memory allocations. The pseudocode generates is as follows: \\
+	
+	bestFit = MAX\_BLOCK\_SIZE
+	For(blocks) \\
+		if(slob.size - blocks[i].size $<$ bestFit \&\& (slob.size - blocks[i]) $>$ 0)\\
+			bestFit = blocks[i] \\
+	end \\
 
+	if(bestFit == MAX\_BLOCK\_SIZE) \\
+		print "Not enough room"	\\
+		return \\
+	alloc(slob,bestFit)\\
+	
+	After turning the above pseduocode into actual code and implementing it into our new slob.c file we loaded yocto Linux with our new SLOB Best-Fit allocator and attempted to run it to test for errors. We then created a test file and usedthis test file to compare the space efficieny of the two algorithims.\\ 
+ 
 	\textbf{Testing Methodology}\\
+	
+	Our initial testing methodology focused on trouble shooting errors that were created when we tried to load yocto Linux with our new slob.c file. Afterwards, we created a new .c file that can be used to test the space efficieny of the two algorithims. This test file displays the claimed memory, free memory, and fragmentation that has been generated after each iteration of our SLOB algorithims. The result of these tests are as follows: (INSERT TEST RESULTS)\\
 
 
 	\textbf{Lessons Learned}\\
+
+	This assignment primarly focused on memory allocation in Linux. We learned about the efficieny between the two algorithims, First-Fit and Best-Fit, and how Best-Fit is a better algorithim that can reduce fragmentation of the system. Additionally, examining the slob.c code taught us a great deal about how memory can be physically allocated on the computer and introduced us to different manners of allocating this physical memory. 
+
 
 	\clearpage
 
