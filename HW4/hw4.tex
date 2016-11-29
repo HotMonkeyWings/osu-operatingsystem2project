@@ -80,6 +80,7 @@ The purpose of this paper is to describe the design and implementation of the SL
 		return \\
 	alloc(slob,bestFit)\\
 	
+	Essentially, what the pseudocode is trying to convey is a search for the minimum difference between the block to be allocated and the free block space. For instance, if a block to be allocated has a size of 50 bytes and there are free blocks of 75, 100, 65, and 51 bytes, the minimum will be updated to 75, then 65, then 51. After iterating through the free block list the program will allocate the necessary block in the minimum block space. This is a brute force solution so it would take O(n) where n is the number of free blocks in the list.\\
 	After turning the above pseduocode into actual code and implementing it into our new slob.c file we loaded yocto Linux with our new SLOB Best-Fit allocator and attempted to run it to test for errors. We then created a test file and usedthis test file to compare the space efficieny of the two algorithims.\\ 
  
 	\textbf{Testing Methodology}\\
