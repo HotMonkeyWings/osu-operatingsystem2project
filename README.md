@@ -1,3 +1,1 @@
-# CS444
-
-Jonathan and Kyle
+# [OSU] CS 444 - Operating Systems 2
